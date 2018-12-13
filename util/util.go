@@ -48,14 +48,35 @@ func HandleContent(content string) string {
 	alertDetail := strings.Join(msgParts[1:], ",")
 	alertTime := parts[5][:len(parts[5])-1]
 
-	content = fmt.Sprintf("Falcon报警\n\n"+
-		"严重等级: %s\n"+
-		"当前状态: %s\n"+
-		"报警环境: %s\n"+
-		"报警内容: %s\n"+
-		"报警参数: %s\n"+
-		"产生时间: %s", alertLevel, alertStatus, alertEnv, alertText, alertDetail, alertTime)
+	title := "Falcon报警"
+	if alertStatus == "OK" {
+		title += "(恢复通知)"
+		alertStatus = "没问题."
+	} else {
+		alertStatus = "有问题!!!"
+	}
+	timeParts := strings.Split(alertTime, " ")
+	if len(timeParts) != 3 {
+		content = fmt.Sprintf("%s\n\n"+
+			"严重等级: %s\n"+
+			"警报状态: %s\n"+
+			"报警节点: %s\n"+
+			"报警备注: %s\n"+
+			"报警参数: %s\n"+
+			"产生时间: %s", title, alertLevel, alertStatus, alertEnv, alertText, alertDetail, alertTime)
+	} else {
+		counter := timeParts[0]
+		realTime := timeParts[1] + " " + timeParts[2]
+		content = fmt.Sprintf("%s\n\n"+
+			"严重等级: %s\n"+
+			"警报状态: %s\n"+
+			"报警节点: %s\n"+
+			"报警备注: %s\n"+
+			"报警参数: %s\n"+
+			"报警次数: %s\n"+
+			"产生时间: %s", title, alertLevel, alertStatus, alertEnv, alertText,
+			alertDetail, counter, realTime)
+	}
 
 	return content
 }
-
